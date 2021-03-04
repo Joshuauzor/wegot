@@ -7,11 +7,12 @@ const bodyParser = require('body-parser');
 const expressSession = require('express-session');
 const session = require('express-session');
 const joi = require('joi');
+const nodemailer = require('nodemailer');
 // const Validator = require('./util/validator'); 
 
 // DECLARATION ENDS
 const app = express();
-const port = 3000;
+const port = 5000;
 // middleware
 var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
 
@@ -44,14 +45,29 @@ db.connect((err) => {
 // database ends 
 
 // using session middleware
+// app.use(session({
+//   secret: 'We Got',
+//   resave: false,
+//   saveUninitialized: true,
+//   cookie: {
+//     secure: true
+//   }
+// }));
+
+// Node mailer
+
+// ends
+
+app.set('trust proxy', 1) // trust first proxy
 app.use(session({
   secret: 'We Got',
   resave: false,
   saveUninitialized: true,
-  cookie: {
-    secure: true
-  }
-}));
+  cookie: { secure: true }, 
+  // genid: function(req) {
+  //   return genuuid() // use UUIDs for session IDs
+  // },
+}))
 
 user(app);
 

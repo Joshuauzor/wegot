@@ -8,6 +8,8 @@ module.exports = function(app){
     const expressSession = require('express-session');
     const session = require('express-session');
     const Joi = require('joi');
+    const nodemailer = require('nodemailer');
+
 
 
     var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
@@ -78,12 +80,11 @@ module.exports = function(app){
                 // return res.render('auth/register', {
                 //     message: 'Email already exists!'
                 // })
-                return res.redirect('/register')
-
+                return res.status(400).redirect('/register');
             };
 
             let hashedPassword = await bcrypt.hash(password, 8);
-
+            
             let newUsers = [
                 {
                     firstname : firstname,
@@ -100,7 +101,37 @@ module.exports = function(app){
                     throw err;
                 }
                 else{
-                    return res.redirect('/login')
+                    // send mail                       
+                    // create reusable transporter object using the default SMTP transport
+                        let transporter = nodemailer.createTransport({
+                            // host: "ssl://smtp.gmail.com",
+                            // port: 465,
+                            service: 'gmail',
+                            //secure: true, // true for 465, false for other ports
+                            auth: {
+                            user: 'Zealtechnologies10@gmail.com', // generated ethereal user
+                            pass: 'Zealtechnologies21', // generated ethereal password
+                            },
+                        });
+    
+                        // send mail with defined transport object
+                        let mailOptions = {
+                            from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
+                            to: "joshuauzor10@gmail.com", // list of receivers
+                            subject: "Account Activation ✔", // Subject line
+                            html: "<b>Please activate your accountb>", // html body
+                        };
+
+                        transporter.sendMail(mailOptions, function (error, data) {
+                            if(error){
+                                throw error;
+                            }
+                            else{
+                                console.log('Mail sent');
+                            }
+                        });                    
+                    // end
+                    return res.status(200).redirect('/login')
                 }
             }); 
         })
