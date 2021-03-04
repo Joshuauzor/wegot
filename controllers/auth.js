@@ -1,6 +1,6 @@
 module.exports = function(app){
     const express = require('express');
-    const dotenv = require('dotenv');
+    const dotenv = require('dotenv').config();
     const bcrypt = require('bcryptjs');
     const expressValidator = require('express-validator');
     const mysql = require('mysql');
@@ -9,7 +9,7 @@ module.exports = function(app){
     const session = require('express-session');
     const Joi = require('joi');
     const nodemailer = require('nodemailer');
-
+    // const sendMail = require('helper/email_helper');
 
 
     var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
@@ -17,19 +17,19 @@ module.exports = function(app){
     //hidding with .env
    //creating mysql connection 
     //hidding with .env
-    // const db = mysql.createConnection({
-    //     host: process.env.DATABASE_HOST,
-    //     user: process.env.DATABASE_USER,
-    //     password: process.env.DATABASE_PASSWORD,
-    //     database: process.env.DATABASE,
-    // });
-
     const db = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '', 
-        database: 'wegot',
+        host: process.env.DATABASE_HOST,
+        user: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE, 
     });
+
+    // const db = mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     password: '', 
+    //     database: 'wegot',
+    // });
 
     //connecting
     db.connect((err) => {
@@ -55,7 +55,7 @@ module.exports = function(app){
             email: Joi.string().min(6).required().email(),
             gender: Joi.string().required(),
             password: Joi.string().min(5).required(),  
-            confirm_pass: Joi.string() .min(5).required().valid(Joi.ref('password'))
+            confirm_pass: Joi.string().min(5).required().valid(Joi.ref('password'))
         });
             
         
@@ -84,59 +84,59 @@ module.exports = function(app){
             };
 
             let hashedPassword = await bcrypt.hash(password, 8);
-            
-            let newUsers = [
+
+            let newUser = [
                 {
                     firstname : firstname,
                     lastname : lastname,
                     email : email,
                     gender : gender,
                     password : hashedPassword
-                }
+                } 
             ];
-            // let hashedPassword = await bcrypt.hash(password, 8);
-            // console.log(hashedPassword);
-            db.query('INSERT INTO user SET ?', newUsers, (err, results) => {
+
+            db.query('INSERT INTO user SET ?', newUser, (err, results) => {
                 if(err){
                     throw err;
                 }
                 else{
-                    // send mail                       
-                    // create reusable transporter object using the default SMTP transport
-                        let transporter = nodemailer.createTransport({
-                            // host: "ssl://smtp.gmail.com",
-                            // port: 465,
-                            service: 'gmail',
-                            //secure: true, // true for 465, false for other ports
-                            auth: {
-                            user: 'Zealtechnologies10@gmail.com', // generated ethereal user
-                            pass: 'Zealtechnologies21', // generated ethereal password
-                            },
-                        });
-    
-                        // send mail with defined transport object
-                        let mailOptions = {
-                            from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
-                            to: "joshuauzor10@gmail.com", // list of receivers
-                            subject: "Account Activation ✔", // Subject line
-                            html: "<b>Please activate your accountb>", // html body
-                        };
+                    // send mail     
+                         // create reusable transporter object using the default SMTP transport
+                    let transporter = nodemailer.createTransport({
+                        // host: "ssl://smtp.gmail.com",
+                        // port: 465,
+                        service: 'gmail', 
+                        //secure: true, // true for 465, false for other ports
+                        auth: {
+                        user: 'Zealtechnologies10@gmail.com', // generated ethereal user
+                        pass: 'Zealtechnologies21', // generated ethereal password
+                        },
+                    });
+                    
+                    // send mail with defined transport object
+                    let mailOptions = {
+                        from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
+                        to: req.body.email, // list of receivers
+                        subject: "Account Activation", // Subject line
+                        html: "<b>Dear"+ req.body.firstname+" "+ req.body.lastname +"</b> Please activate your account by clicking on the link below.<a href='google.com'>Click here..</a>  <br> Thanks" // html body 
+                    };
 
-                        transporter.sendMail(mailOptions, function (error, data) {
-                            if(error){
-                                throw error;
-                            }
-                            else{
-                                console.log('Mail sent');
-                            }
-                        });                    
-                    // end
-                    return res.status(200).redirect('/login')
+                    transporter.sendMail(mailOptions, function (error, data) {
+                        if(error){
+                            throw error;
+                        }
+                        else{
+                            console.log('Mail sent'); 
+                        }
+                    });  
+                    // end  
+                    return res.status(200).redirect('/login')  
                 }
             }); 
         })
         }
     });
+
 
     // --------------------------------------------------------------------
 
@@ -158,7 +158,10 @@ module.exports = function(app){
                     // return res.redirect('/login');
                 }
                 // add session
-                return res.status(200).redirect('home');
+                // return res.status(200).json({
+                //     message: 'success'
+                // })
+                return res.status(200).redirect('/dashboard');
 
             }) 
         }

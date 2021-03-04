@@ -1,25 +1,33 @@
-function register_mail(params) {
-    
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
+module.exports = class email {
+// async with await
+ static async sendMail(receiversMail, receiversName){
+    // create reusable transporter object using the default SMTP transport
+   let transporter = nodemailer.createTransport({
+          // host: "ssl://smtp.gmail.com",
+          // port: 465,
+          service: 'gmail', 
+          //secure: true, // true for 465, false for other ports
+          auth: {
+          user: 'Zealtechnologies10@gmail.com', // generated ethereal user
+          pass: 'Zealtechnologies21', // generated ethereal password
+          },
+      });
 
-  // send mail with defined transport object
-  let info = await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>', // sender address
-    to: "bar@example.com, baz@example.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
+      // send mail with defined transport object
+      let mailOptions = {
+          from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
+          to: receiversMail, // list of receivers
+          subject: "Account Activation", // Subject line
+          html: "<b>Dear </b> Please activate your account by clicking on the link below. <br> Thanks", // html body 
+      };
 
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+     return await transporter.sendMail(mailOptions, function (error, data) {
+          if(error){
+              throw error;
+          }
+          else{
+              console.log('Mail sent'); 
+          }
+      });   
+  }  
 }

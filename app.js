@@ -17,7 +17,7 @@ const port = 5000;
 var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
 
 app.get('/contact/:name', (req, res) => {
-  res.send('Contact World Mr.'+ req.params.name);
+  res.send('Contact World Mr.'+ req.params.name); 
 });
 
 app.set('view engine', 'ejs');
@@ -26,19 +26,19 @@ app.use('/assets', express.static('assets'));
 app.use('/', require('./routes/pages'));
 app.use('/home', require('./routes/home'));
 
-var user = require('./controllers/auth');
+var user = require('./controllers/auth'); 
 
 // database 
 const db = mysql.createConnection({
-  database: process.env.DATABASE,
   host: process.env.DATABASE_HOST,
   user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE,
 });
 
 db.connect((err) => {
   if(err){
-    throw err;
+    throw err; 
   }
   console.log('Mysql connected to localhost');
 });
@@ -71,6 +71,6 @@ app.use(session({
 
 user(app);
 
-app.listen(port, () => {
+app.listen(port, () => { 
   console.log(`App started at http://localhost:${port}`)
 })
