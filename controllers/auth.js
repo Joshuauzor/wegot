@@ -9,6 +9,8 @@ module.exports = function(app){
     const session = require('express-session');
     const Joi = require('joi');
     const nodemailer = require('nodemailer');
+    const jwt = require('jsonwebtoken');
+
     // const sendMail = require('helper/email_helper');
 
 
@@ -157,13 +159,35 @@ module.exports = function(app){
                     return res.status(401).json(error);
                     // return res.redirect('/login');
                 }
+                 
+                //assign user to the result
+                const user = [
+                    {
+                        firstname : result[0].firstname,
+                        lastname : result[0].lastname,
+                        email : result[0].email,
+                        uniid : result[0].uniid,
+                        gender : result[0].gender
+
+                    }
+                ];
+
+
+                // console.log(user);
                 // add session
-                // return res.status(200).json({
-                //     message: 'success'
-                // })
-                return res.status(200).redirect('/dashboard');
+                jwt.sign({user}, 'mysecretkey', (error, token) => {
+                    res.json({
+                        token
+                    });
+                });
+                // session end
+                
+                // return res.status(200).redirect('/home');
 
             }) 
         }
-    })
+    });
+
+
+    // ------------------------------------------------------------------------
 }

@@ -8,6 +8,7 @@ const expressSession = require('express-session');
 const session = require('express-session');
 const joi = require('joi');
 const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 // const Validator = require('./util/validator'); 
 
 // DECLARATION ENDS
