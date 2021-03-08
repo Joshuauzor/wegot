@@ -18,4 +18,26 @@ router.get('/forgot_pass', (req, res) => {
     res.render('auth/forgot_pass', {title: 'Forgot Password - We Got'});
 });
 
+// router.get('/logout',  (req, res) => {
+//     res.cookie('jwt', '', {maxAge: 1});
+
+//     // destroy
+//     // // get auth header value
+//     // const bearerHeader = req.headers['authorization'];
+//     // // check if bearer is undefined
+//     // if(typeof bearerHeader !== 'undefined'){
+//     //     //Split at the space
+//     //     const bearer = bearerHeader.split(' ');
+//     //     //get token from array
+//     //     const bearerToken = bearer[1];
+//     //     // set token
+//     //     req.token = 'bearerToken';
+//     //     // next middleware
+//     // }
+//     // destroy end
+//     res.status(200).json({
+//         message: 'You are logged out'
+//     })
+// })
+
 module.exports = router;

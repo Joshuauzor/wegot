@@ -9,6 +9,7 @@ const session = require('express-session');
 const joi = require('joi');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 // const Validator = require('./util/validator'); 
 
 // DECLARATION ENDS
@@ -27,7 +28,10 @@ app.use('/assets', express.static('assets'));
 app.use('/', require('./routes/pages'));
 app.use('/home', require('./routes/home'));
 
+// controller
 var user = require('./controllers/auth'); 
+var home = require('./controllers/home'); 
+
 
 // database 
 const db = mysql.createConnection({
@@ -71,6 +75,7 @@ app.use(session({
 }))
 
 user(app);
+home(app);
 
 app.listen(port, () => { 
   console.log(`App started at http://localhost:${port}`)

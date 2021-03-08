@@ -1,12 +1,13 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv').config();
 const authn = require('../controllers/auth');
 const auth = require('../models/verifyUser');
 
 const router = express.Router();
 
 router.get('/', verifyToken, (req, res) => {
-    jwt.verify(req.token, 'mysecretkey', (error, results) => {
+    jwt.verify(req.token, process.env.JWT_SECRET_TOKEN, (error, results) => {
         if(error){
             res.sendStatus(403);
         }
@@ -19,6 +20,8 @@ router.get('/', verifyToken, (req, res) => {
     });
     // res.render('home/index', {title: 'Dashboard'});
 });
+
+// -------------------------------------------------------
 
 // check token for the route
 function verifyToken(req, res, next) {
@@ -37,8 +40,10 @@ function verifyToken(req, res, next) {
     }
     else{
         // forbidded
-        res.sendStatus(403);
+        return res.sendStatus(403);
     }
 }
+
+// -----------------------------------------------------
 
 module.exports = router;

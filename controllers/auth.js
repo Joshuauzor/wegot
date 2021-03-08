@@ -82,7 +82,11 @@ module.exports = function(app){
                 // return res.render('auth/register', {
                 //     message: 'Email already exists!'
                 // })
-                return res.status(400).redirect('/register');
+                // return res.status(400).redirect('/register');
+                return res.status(400).json({
+                    message: 'Email already exist'
+                });
+
             };
 
             let hashedPassword = await bcrypt.hash(password, 8);
@@ -110,8 +114,8 @@ module.exports = function(app){
                         service: 'gmail', 
                         //secure: true, // true for 465, false for other ports
                         auth: {
-                        user: 'Zealtechnologies10@gmail.com', // generated ethereal user
-                        pass: 'Zealtechnologies21', // generated ethereal password
+                        user: process.env.EMAIL_USERNAME, // generated ethereal user
+                        pass: process.env.EMAIL_PASSWORD, // generated ethereal password
                         },
                     });
                     
@@ -120,7 +124,7 @@ module.exports = function(app){
                         from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
                         to: req.body.email, // list of receivers
                         subject: "Account Activation", // Subject line
-                        html: "<b>Dear"+ req.body.firstname+" "+ req.body.lastname +"</b> Please activate your account by clicking on the link below.<a href='google.com'>Click here..</a>  <br> Thanks" // html body 
+                        html: "<b>Dear"+" "+req.body.firstname+" "+ req.body.lastname +"</b> Please activate your account by clicking on the link below.<a href='google.com'>Click here..</a>  <br> Thanks" // html body 
                     };
 
                     transporter.sendMail(mailOptions, function (error, data) {
@@ -132,7 +136,11 @@ module.exports = function(app){
                         }
                     });  
                     // end  
-                    return res.status(200).redirect('/login')  
+                    // return res.status(200).redirect('/login')  
+                    return res.status(200).json({
+                        message: 'User registered and mail sent'
+                    })  
+
                 }
             }); 
         })
@@ -160,34 +168,67 @@ module.exports = function(app){
                     // return res.redirect('/login');
                 }
                  
-                //assign user to the result
-                const user = [
+                //assign user to the result so we can use in session
+                const user = 
                     {
+                        id: result[0].id,
                         firstname : result[0].firstname,
                         lastname : result[0].lastname,
                         email : result[0].email,
                         uniid : result[0].uniid,
                         gender : result[0].gender
+                    };
 
-                    }
-                ];
-
-
-                // console.log(user);
                 // add session
-                jwt.sign({user}, 'mysecretkey', (error, token) => {
+                // jwt.sign({user}, process.env.JWT_SECRET_TOKEN, (error, token) => {
+                    const token = generateAccessToken(user);
+                    const refreshToken = jwt.sign({user}, process.env.JWT_REFRESH_TOKEN)
+                    // refresh token added
+                    refreshTokens.push(refreshToken);
+                    // ends
                     res.json({
-                        token
+                        token: token,
+                        refreshToken: refreshToken
                     });
-                });
+                // });
                 // session end
                 
-                // return res.status(200).redirect('/home');
+                // return res.status(200).json({
+                //     message: 'welcome to the dashboard'
+                // });
 
             }) 
         }
     });
 
 
+    function generateAccessToken(user) {
+       return jwt.sign({user}, process.env.JWT_SECRET_TOKEN, {expiresIn: '300s'});
+    }
+
     // ------------------------------------------------------------------------
+
+    let refreshTokens = [];
+
+    app.post('/token', urlencodedParser, (req, res, next) => {
+        const refreshToken = req.body.token;
+        if(refreshToken == null) return res.sendStatus(401);
+        if(!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+        jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (error, results) => {
+            if(error) return res.sendStatus(403);
+            const accessToken = generateAccessToken(results);
+            res.json({accessToken});
+           
+        });
+        // res.json({
+        //     token: refreshToken
+        // });
+    })
+
+    // delete
+    app.delete('/logout', (req, res) => {
+        // console.log(token);
+        refreshTokens = refreshTokens.filter(token => token !== req.body.token)
+        res.sendStatus(204)
+    })
 }
