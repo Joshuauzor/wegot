@@ -73,13 +73,13 @@ module.exports = function(app){
                         //        message: req.file
                         //    });
                            // insert into the database
-                           let data = [
-                            {
-                                'profile_pics' : req.file.path
-                            }
-                       ];
+                    //        let data = [
+                    //         {
+                    //             'profile_pics' : req.file.path
+                    //         }
+                    //    ];
     
-                        db.query('UPDATE user SET profile_pics = profile_pics WHERE id = '+userId, (error, results) => {
+                        db.query('UPDATE user SET profile_pics = ? WHERE id = ?', [req.file.path, userId], (error, results) => {
                            if(error){
                               return res.status(503).json({
                                    message: error

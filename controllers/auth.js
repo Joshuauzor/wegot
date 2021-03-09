@@ -15,8 +15,6 @@ module.exports = function(app){
 
 
     var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
-    //creating mysql connection 
-    //hidding with .env
    //creating mysql connection 
     //hidding with .env
     const db = mysql.createConnection({
@@ -26,12 +24,6 @@ module.exports = function(app){
         database: process.env.DATABASE, 
     });
 
-    // const db = mysql.createConnection({
-    //     host: 'localhost',
-    //     user: 'root',
-    //     password: '', 
-    //     database: 'wegot',
-    // });
 
     //connecting
     db.connect((err) => {
@@ -164,7 +156,9 @@ module.exports = function(app){
             const {email, password} = req.body;
             db.query('SELECT * FROM user WHERE email = ?', [email], async (error, result) => {
                 if(!result || !(await bcrypt.compare(password, result[0].password))){
-                    return res.status(401).json(error);
+                    return res.sendStatus(401).json({
+                        error: error
+                    });
                     // return res.redirect('/login');
                 }
                  

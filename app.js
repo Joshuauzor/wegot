@@ -14,7 +14,7 @@ const multer = require('multer');
 
 // DECLARATION ENDS
 const app = express();
-const port = 5000;
+const port = 3000;
 // middleware
 var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
 
