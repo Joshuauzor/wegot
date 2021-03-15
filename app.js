@@ -10,11 +10,14 @@ const joi = require('joi');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const path = require('path');
+const Nexmo = require('nexmo');
+const socketio = require('socket.io');
 // const Validator = require('./util/validator'); 
 
 // DECLARATION ENDS
 const app = express();
-const port = 3000;
+const port = 5000;
 // middleware
 var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
 

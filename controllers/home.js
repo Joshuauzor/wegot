@@ -12,9 +12,19 @@ module.exports = function(app){
     const jwt = require('jsonwebtoken');
     const multer = require('multer');
     const path = require('path');
+    const Nexmo = require('nexmo');
+    const socketio = require('socket.io');
+    // const  sequelize  = require('sequelize');
+    const dab = require('../connection');
+    const Users = require('../models/Users');
 
+    // 
+   
+    dab.authenticate()
+    .then(() => console.log('database connected....'))
+    .catch(err => console.log('Error:' + err));
 
-    // const sendMail = require('helper/email_helper');
+    // const sendMail = require('helper/email_helper'); 
 
 
     var urlencodedParser = bodyParser.urlencoded({ extended: false }); //required
@@ -167,4 +177,39 @@ module.exports = function(app){
         }
     }
 
+
+    // --------------------------------------------------------------------------------------
+    //send text message 
+
+    app.post('/send_sms', urlencodedParser, (req, res, next) => {
+
+        const schema = Joi.object({
+            phone: Joi.number().required().min(10),
+            message: Joi.string().required()
+        });
+
+        const {value, error} = schema.validate(req.body);
+        if(error && error.details){
+            return res.status(400).json(error);
+        }
+        else{
+            // res.sendStatus(201).
+            return res.json({
+                message: req.body
+            })
+        }
+    })
+
+    // --------------------------------------------------
+
+    app.get('/all_users', (req, res) => {
+        Users.findAll()
+        .then(Users => {
+            console.log(Users)
+            return res.status(200).json({
+                success: Users
+            });
+        })
+        .catch( err => console.log(err))
+    })
  }

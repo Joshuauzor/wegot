@@ -10,6 +10,8 @@ module.exports = function(app){
     const Joi = require('joi');
     const nodemailer = require('nodemailer');
     const jwt = require('jsonwebtoken');
+    const crypto = require('crypto');
+
 
     // const sendMail = require('helper/email_helper');
 
@@ -67,7 +69,10 @@ module.exports = function(app){
 
         db.query('SELECT email FROM user WHERE email = ?', [email], async (err, results) => {
             if(err){
-                throw err; 
+                // throw err; 
+                return res.sendStatus(403).json({
+                    error: err
+                });
             }
 
             if(results.length > 0){
@@ -75,6 +80,7 @@ module.exports = function(app){
                 //     message: 'Email already exists!'
                 // })
                 // return res.status(400).redirect('/register');
+                // res.sendStatus(403);
                 return res.status(400).json({
                     message: 'Email already exist'
                 });
@@ -113,7 +119,7 @@ module.exports = function(app){
                     
                     // send mail with defined transport object
                     let mailOptions = {
-                        from: '"Joshua Uzor 👻" <Zealtechnologies10@gmail.com>', // sender address
+                        from: '"Joshua Uzor" <Zealtechnologies10@gmail.com>', // sender address
                         to: req.body.email, // list of receivers
                         subject: "Account Activation", // Subject line
                         html: "<b>Dear"+" "+req.body.firstname+" "+ req.body.lastname +"</b> Please activate your account by clicking on the link below.<a href='google.com'>Click here..</a>  <br> Thanks" // html body 
@@ -129,7 +135,7 @@ module.exports = function(app){
                     });  
                     // end  
                     // return res.status(200).redirect('/login')  
-                    return res.status(200).json({
+                    return res.status(201).json({
                         message: 'User registered and mail sent'
                     })  
 
